@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -12,24 +13,49 @@ import (
 	"github.com/jakoubek/onetimecode"
 )
 
-type answer struct {
-	Code   string `json:"code"`
-	Mode   string `json:"mode"`
-	Length int    `json:"length"`
-}
-
 func main() {
 	r := mux.NewRouter()
+	r.HandleFunc("/", rootInfo).Methods("GET")
 	r.HandleFunc("/onetime", processOnetimecode).Methods("GET")
+	log.Print("Starting server on " + getServerPort())
 	http.ListenAndServe(getServerPort(), r)
+}
+
+func rootInfo(w http.ResponseWriter, r *http.Request) {
+
+	type result struct {
+		Result string `json:"result"`
+		Info   string `json:"info"`
+	}
+
+	response := result{
+		Result: "OK",
+		Info:   "Go to https://www.onetimecode.net for information on how to access the API.",
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+
 }
 
 func processOnetimecode(w http.ResponseWriter, r *http.Request) {
 
+	type answer struct {
+		Code   string `json:"code"`
+		Mode   string `json:"mode"`
+		Length int    `json:"length"`
+	}
+
 	q := r.URL.Query()
 
+	format := q.Get("format")
 	mode := q.Get("mode")
 	lengthStr := q.Get("length")
+
+	if format == "" {
+		format = "json"
+	}
 
 	if mode == "" {
 		mode = "numbers"
@@ -66,9 +92,16 @@ func processOnetimecode(w http.ResponseWriter, r *http.Request) {
 		Length: length,
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(result)
+	if format == "txt" {
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(code))
+	} else {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(result)
+	}
+
 }
 
 func getServerPort() string {
