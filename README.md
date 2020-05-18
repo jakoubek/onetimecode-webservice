@@ -1,20 +1,20 @@
 # onetimecode-webservice
-Webservice for one-time codes
+Webservice for one-time codes. Access the API at https://api.onetimecode.net/onetime.
 
 **onetimecode-webservice** is a webservice that encapsulates the [onetimecode package](https://github.com/jakoubek/onetimecode) for Golang.
 
 ## Usage
 
 ```
-curl -X GET 'http://api.onetimecode.net/onetime'
+curl -X GET 'https://api.onetimecode.net/onetime'
 
-curl -X GET 'http://api.onetimecode.net/onetime?mode=numbers&length=10'
+curl -X GET 'https://api.onetimecode.net/onetime?mode=numbers&length=10'
 
-curl -X GET 'http://api.onetimecode.net/onetime?mode=alphanum&length=18'
+curl -X GET 'https://api.onetimecode.net/onetime?mode=alphanum&length=18'
 
-curl -X GET 'http://api.onetimecode.net/onetime?mode=alphanumuc&length=40'
+curl -X GET 'https://api.onetimecode.net/onetime?mode=alphanumuc&length=40'
 
-curl -X GET 'http://api.onetimecode.net/onetime?format=txt'
+curl -X GET 'https://api.onetimecode.net/onetime?format=txt'
 ```
 
 ### Response
