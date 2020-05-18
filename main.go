@@ -42,6 +42,7 @@ func rootInfo(w http.ResponseWriter, r *http.Request) {
 func processOnetimecode(w http.ResponseWriter, r *http.Request) {
 
 	type answer struct {
+		Result string `json:"result"`
 		Code   string `json:"code"`
 		Mode   string `json:"mode"`
 		Length int    `json:"length"`
@@ -87,6 +88,7 @@ func processOnetimecode(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var result = answer{
+		Result: "OK",
 		Code:   code,
 		Mode:   mode,
 		Length: length,

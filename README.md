@@ -21,6 +21,7 @@ curl -X GET 'http://api.baneland.de/onetime?format=txt'
 
 ```json
 {
+  "result": "OK",
   "code": "648197",
   "mode": "numbers",
   "length": 6
