@@ -14,7 +14,10 @@ import (
 	"github.com/jakoubek/onetimecode"
 )
 
+var starttime time.Time
+
 func main() {
+	starttime = time.Now()
 	r := mux.NewRouter()
 	r.HandleFunc("/", rootInfo).Methods("GET")
 	r.HandleFunc("/onetime", processOnetimecode).Methods("GET")
@@ -114,17 +117,19 @@ func processOnetimecode(w http.ResponseWriter, r *http.Request) {
 func processStatus(w http.ResponseWriter, r *http.Request) {
 
 	type answer struct {
-		Result    string `json:"result"`
-		Info      string `json:"info"`
-		Timestamp int64  `json:"timestamp"`
-		Requests  int    `json:"requests"`
+		Result        string    `json:"result"`
+		Info          string    `json:"info"`
+		ServerStarted time.Time `json:"server_started"`
+		Timestamp     int64     `json:"timestamp"`
+		Requests      int       `json:"requests"`
 	}
 
 	result := answer{
-		Result:    "OK",
-		Info:      "API fully operational",
-		Timestamp: time.Now().Unix(),
-		Requests:  -1,
+		Result:        "OK",
+		Info:          "API fully operational",
+		ServerStarted: starttime,
+		Timestamp:     time.Now().Unix(),
+		Requests:      -1,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
