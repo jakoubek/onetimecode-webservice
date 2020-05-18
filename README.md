@@ -6,15 +6,15 @@ Webservice for one-time codes
 ## Usage
 
 ```
-curl -X GET 'http://api.baneland.de/onetime'
+curl -X GET 'http://api.onetimecode.net/onetime'
 
-curl -X GET 'http://api.baneland.de/onetime?mode=numbers&length=10'
+curl -X GET 'http://api.onetimecode.net/onetime?mode=numbers&length=10'
 
-curl -X GET 'http://api.baneland.de/onetime?mode=alphanum&length=18'
+curl -X GET 'http://api.onetimecode.net/onetime?mode=alphanum&length=18'
 
-curl -X GET 'http://api.baneland.de/onetime?mode=alphanumuc&length=40'
+curl -X GET 'http://api.onetimecode.net/onetime?mode=alphanumuc&length=40'
 
-curl -X GET 'http://api.baneland.de/onetime?format=txt'
+curl -X GET 'http://api.onetimecode.net/onetime?format=txt'
 ```
 
 ### Response
