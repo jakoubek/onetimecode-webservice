@@ -17,6 +17,16 @@ curl -X GET 'http://api.baneland.de/onetime?mode=alphanumuc&length=40'
 curl -X GET 'http://api.baneland.de/onetime?format=txt'
 ```
 
+### Response
+
+```json
+{
+  "code": "648197",
+  "mode": "numbers",
+  "length": 6
+}
+```
+
 ## Optional parameters
 
 ### mode
