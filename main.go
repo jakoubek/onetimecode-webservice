@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 
@@ -17,6 +18,7 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", rootInfo).Methods("GET")
 	r.HandleFunc("/onetime", processOnetimecode).Methods("GET")
+	r.HandleFunc("/status", processStatus).Methods("GET")
 	log.Print("Starting server on " + getServerPort())
 	http.ListenAndServe(getServerPort(), r)
 }
@@ -30,7 +32,7 @@ func rootInfo(w http.ResponseWriter, r *http.Request) {
 
 	response := result{
 		Result: "OK",
-		Info:   "Go to https://www.onetimecode.net for information on how to access the API.",
+		Info:   "Go to https://www.onetimecode.net for information on how to access the API. See /status for API health.",
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -106,6 +108,28 @@ func processOnetimecode(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(result)
 	}
+
+}
+
+func processStatus(w http.ResponseWriter, r *http.Request) {
+
+	type answer struct {
+		Result    string `json:"result"`
+		Info      string `json:"info"`
+		Timestamp int64  `json:"timestamp"`
+		Requests  int    `json:"requests"`
+	}
+
+	result := answer{
+		Result:    "OK",
+		Info:      "API fully operational",
+		Timestamp: time.Now().Unix(),
+		Requests:  -1,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(result)
 
 }
 
