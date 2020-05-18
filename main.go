@@ -71,6 +71,9 @@ func processOnetimecode(w http.ResponseWriter, r *http.Request) {
 		if length <= 0 {
 			length = 6
 		}
+		if length > 100 {
+			length = 100
+		}
 	}
 
 	var code string

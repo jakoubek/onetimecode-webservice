@@ -40,7 +40,7 @@ The `mode` parameter determines the kind of onetimecode that is returned:
 
 ### length
 
-The `length` parameter determines the length of the returned code. The default length is 6. Setting the length to 0 or less uses the default of 6.
+The `length` parameter determines the length of the returned code. The default length is 6. Setting the length to 0 or less uses the default of 6. The highest allowed length is 100. A length higher than 100 gets reduced to 100.
 
 ### format
 
