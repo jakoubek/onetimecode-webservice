@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/jakoubek/onetimecode-webservice/algorithm"
+
 	"github.com/jakoubek/onetimecode-webservice/requestlogger"
 
 	"github.com/gorilla/mux"
@@ -28,6 +30,7 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", rootInfo).Methods("GET")
 	r.HandleFunc("/onetime", processOnetimecode).Methods("GET")
+	r.HandleFunc("/ksuid", processKsuid).Methods("GET")
 	r.HandleFunc("/status", processStatus).Methods("GET")
 	log.Print("Starting server on " + getServerPort())
 	http.ListenAndServe(getServerPort(), r)
@@ -124,6 +127,48 @@ func processOnetimecode(w http.ResponseWriter, r *http.Request) {
 		mode = "numbers"
 		code = onetimecode.NumberCode(length)
 	}
+
+	var result = answer{
+		Result: "OK",
+		Code:   code,
+		Mode:   mode,
+		Length: length,
+	}
+
+	if format == "txt" {
+		w.Header().Set("Content-Type", "text/plain")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(code))
+	} else {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(result)
+	}
+
+}
+
+func processKsuid(w http.ResponseWriter, r *http.Request) {
+
+	logRequest()
+
+	type answer struct {
+		Result string `json:"result"`
+		Code   string `json:"code"`
+		Mode   string `json:"mode"`
+		Length int    `json:"length"`
+	}
+
+	q := r.URL.Query()
+
+	format := q.Get("format")
+	mode := "ksuid"
+
+	if format == "" {
+		format = "json"
+	}
+
+	code := algorithm.NewKsuid()
+	length := len(code)
 
 	var result = answer{
 		Result: "OK",

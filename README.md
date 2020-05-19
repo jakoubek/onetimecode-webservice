@@ -15,6 +15,8 @@ curl -X GET 'https://api.onetimecode.net/onetime?mode=alphanum&length=18'
 curl -X GET 'https://api.onetimecode.net/onetime?mode=alphanumuc&length=40'
 
 curl -X GET 'https://api.onetimecode.net/onetime?format=txt'
+
+curl -X GET 'https://api.onetimecode.net/ksuid'
 ```
 
 ### Response
@@ -27,6 +29,12 @@ curl -X GET 'https://api.onetimecode.net/onetime?format=txt'
   "length": 6
 }
 ```
+
+## Endpoints
+
+- `/onetime` returns a one-time code
+- `/ksuid` returns a KSUID (see [segmentio/ksuid](https://github.com/segmentio/ksuid))
+- `/status` returns a status object
 
 ## Optional parameters
 
