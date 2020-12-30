@@ -1,4 +1,4 @@
-package handler
+package main
 
 import (
 	"encoding/json"
@@ -7,7 +7,8 @@ import (
 	"strconv"
 )
 
-func Number(w http.ResponseWriter, r *http.Request) {
+func (s *server) handleNumber() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 
 	type answer struct {
 		Result int64 `json:"result"`
@@ -74,4 +75,5 @@ func Number(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(result)
 	}
 
+}
 }

@@ -2,100 +2,57 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/jakoubek/onetimecode-webservice/handler"
-	"log"
 	"net/http"
 	"os"
-	"time"
-
-	"github.com/jakoubek/onetimecode-webservice/requestlogger"
-
-	"github.com/gorilla/mux"
 )
 
-var starttime time.Time
-var requests int64
-var requestsOld int64
-
 func main() {
-	starttime = time.Now()
-	loadRequestsFromFile()
-	initLogWriter()
 
-	r := mux.NewRouter()
-	r.HandleFunc("/", rootInfo).Methods("GET")
-	r.HandleFunc("/number", handler.Number).Methods("GET")
-	r.HandleFunc("/alphanumeric", handler.Alphanumeric).Methods("GET")
-	r.HandleFunc("/ksuid", handler.Ksuid).Methods("GET")
-	r.HandleFunc("/uuid", handler.Uuid).Methods("GET")
-	//r.HandleFunc("/random", processRandom).Methods("GET")
-	r.HandleFunc("/status", processStatus).Methods("GET")
-	log.Print("Starting server on " + getServerPort())
-	http.ListenAndServe(getServerPort(), r)
+	s := NewServer("Onetimecode-API 1.0", getCounterfile())
+
+	s.logger.Printf("Server is starting on %s...", getServerPort())
+	s.logger.Printf("Counter file: %s...", getCounterfile())
+
+	s.setupRoutes()
+
+	http.ListenAndServe(getServerPort(), s.router)
 }
 
-func initLogWriter() {
-	go func() {
-		for true {
-			if requests > requestsOld {
-				requestlogger.SaveCounterfile(getCounterfile(), requests)
-				requestsOld = requests
-			}
-			time.Sleep(5 * time.Minute)
+func (s *server) setupRoutes() {
+	s.router.HandleFunc("/", s.logRequest(s.handleIndex()))
+	s.router.HandleFunc("/status", s.logRequest(s.handleStatus()))
+	s.router.HandleFunc("/number", s.logRequest(s.handleNumber()))
+	s.router.HandleFunc("/alphanumeric", s.logRequest(s.handleAlphanumeric()))
+	s.router.HandleFunc("/ksuid", s.logRequest(s.handleKsuid()))
+	s.router.HandleFunc("/uuid", s.logRequest(s.handleUuid()))
+	s.router.NotFoundHandler = s.handleNotFound()
+}
+
+func (s *server) handleIndex() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		response := struct {
+			Result string `json:"result"`
+			Info   string `json:"info"`
+		}{
+			Result: "OK",
+			Info:   "Go to https://www.onetimecode.net for information on how to access the API. See /status for API health.",
 		}
-	}()
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(response)
+	}
 }
 
-func loadRequestsFromFile() {
-	requests = requestlogger.ReadCounterfile(getCounterfile())
-	requestsOld = requests
-}
+func (s *server) handleStatus() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 
-func logRequest() {
-	requests++
-}
+			//Result:        "OK",
+			//Info:          "API fully operational",
 
-func rootInfo(w http.ResponseWriter, r *http.Request) {
-
-	type result struct {
-		Result string `json:"result"`
-		Info   string `json:"info"`
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(s.logInfo)
 	}
-
-	response := result{
-		Result: "OK",
-		Info:   "Go to https://www.onetimecode.net for information on how to access the API. See /status for API health.",
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(response)
-
-}
-
-func processStatus(w http.ResponseWriter, r *http.Request) {
-
-	type answer struct {
-		Result        string    `json:"result"`
-		Info          string    `json:"info"`
-		ServerStarted time.Time `json:"server_started"`
-		Timestamp     int64     `json:"timestamp"`
-		Requests      int64     `json:"requests"`
-	}
-
-	result := answer{
-		Result:        "OK",
-		Info:          "API fully operational",
-		ServerStarted: starttime,
-		Timestamp:     time.Now().Unix(),
-		Requests:      requests,
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(result)
-
 }
 
 func getCounterfile() string {
@@ -110,17 +67,4 @@ func getServerPort() string {
 		return ":" + port
 	}
 	return ":3000"
-}
-
-func notfound(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-	w.WriteHeader(http.StatusNotFound)
-	fmt.Fprint(w, "<h1>We could not find the page you were looking for :(</h1><p>Please email us if you keep being sent to an "+
-		"invalid page.</p>")
-}
-
-func must(err error) {
-	if err != nil {
-		panic(err)
-	}
 }
