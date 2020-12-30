@@ -28,6 +28,8 @@ func (s *server) setupRoutes() {
 	s.router.HandleFunc("/alphanumeric", s.logRequest(s.handleAlphanumeric()))
 	s.router.HandleFunc("/ksuid", s.logRequest(s.handleKsuid()))
 	s.router.HandleFunc("/uuid", s.logRequest(s.handleUuid()))
+	s.router.HandleFunc("/dice", s.logRequest(s.handleDice()))
+	s.router.HandleFunc("/coin", s.logRequest(s.handleCoin()))
 	s.router.NotFoundHandler = s.handleNotFound()
 }
 
