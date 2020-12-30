@@ -47,7 +47,10 @@ curl -X GET 'https://api.onetimecode.net/uuid?withoutdashes=true'
 - `/alphanumeric` returns an alphanumerical code
 - `/uuid` returns an UUID
 - `/ksuid` returns a KSUID (see [segmentio/ksuid](https://github.com/segmentio/ksuid))
+- `/dice` is a shortcut for `/number?min=1&max=6`
+- `/coin` is a shortcut for `/number?min=0&max=1` and returns `heads` or `tails`  
 - `/status` returns a status object
+- `/healthz` is the health endpoint
 
 ## Optional parameters
 
