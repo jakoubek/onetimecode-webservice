@@ -23,6 +23,7 @@ func main() {
 func (s *server) setupRoutes() {
 	s.router.HandleFunc("/", s.logRequest(s.handleIndex()))
 	s.router.HandleFunc("/status", s.logRequest(s.handleStatus()))
+	s.router.HandleFunc("/healthz", s.handleHealthz())
 	s.router.HandleFunc("/number", s.logRequest(s.handleNumber()))
 	s.router.HandleFunc("/alphanumeric", s.logRequest(s.handleAlphanumeric()))
 	s.router.HandleFunc("/ksuid", s.logRequest(s.handleKsuid()))
@@ -48,12 +49,27 @@ func (s *server) handleIndex() http.HandlerFunc {
 func (s *server) handleStatus() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-			//Result:        "OK",
-			//Info:          "API fully operational",
+		//Result:        "OK",
+		//Info:          "API fully operational",
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(s.logInfo)
+	}
+}
+
+func (s *server) handleHealthz() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		response := struct {
+			Result string `json:"result"`
+			Info   string `json:"info"`
+		}{
+			Result: "OK",
+			Info:   "API fully operational",
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(response)
 	}
 }
 

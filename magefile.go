@@ -4,16 +4,16 @@ package main
 
 import (
 	"fmt"
-	"path"
 	"os/exec"
+	"path"
 
-	_"github.com/magefile/mage/mg" // mg contains helpful utility functions, like Deps
 	"github.com/magefile/mage/sh"
 )
 
 const (
 	BUILD_DIR     string = "./bin"
 	BUILD_BINARY  string = "onetimecode"
+	DEPLOY_TARGET string = "oli@opal5.opalstack.com:apps/onetimecode/onetimecode.new"
 )
 
 var (
@@ -37,6 +37,21 @@ func Build() error {
 
 	cmd := exec.Command("go", "build", "-ldflags", "-X main.version="+buildVersion, "-o", path.Join(BUILD_DIR, BUILD_BINARY), ".")
 	return cmd.Run()
+}
+
+// Deploy to server
+func Deploy() error {
+	//mg.Deps(Build)
+	fmt.Println("Deploying...")
+
+	cmd := exec.Command("scp", path.Join(BUILD_DIR, BUILD_BINARY), DEPLOY_TARGET)
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+	fmt.Println("Copy to server ok.")
+
+	return nil
 }
 
 // Clean up build directory
