@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func (s *server) handleUuid() http.HandlerFunc {
+func (s *server) handleUuid(format string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		type answer struct {
@@ -16,13 +16,7 @@ func (s *server) handleUuid() http.HandlerFunc {
 
 		q := r.URL.Query()
 
-		format := q.Get("format")
-
 		withoutDashes, _ := strconv.ParseBool(q.Get("withoutdashes"))
-
-		if format == "" {
-			format = "json"
-		}
 
 		var code *onetimecode.Onetimecode
 		if withoutDashes == true {

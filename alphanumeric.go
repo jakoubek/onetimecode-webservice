@@ -7,16 +7,14 @@ import (
 	"strconv"
 )
 
-func (s *server) handleAlphanumeric() http.HandlerFunc {
-	return func(w http.ResponseWriter, r * http.Request) {
+func (s *server) handleAlphanumeric(format string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
 
 		type answer struct {
 			Result string `json:"result"`
 		}
 
 		q := r.URL.Query()
-
-		format := q.Get("format")
 
 		length := -1
 		lengthStr := q.Get("length")

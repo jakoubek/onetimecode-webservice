@@ -7,19 +7,11 @@ import (
 	"strconv"
 )
 
-func (s *server) handleDice() http.HandlerFunc {
+func (s *server) handleDice(format string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		type answer struct {
 			Result int64 `json:"result"`
-		}
-
-		q := r.URL.Query()
-
-		format := q.Get("format")
-
-		if format == "" {
-			format = "json"
 		}
 
 		code := onetimecode.NewNumericalCode(
@@ -43,20 +35,12 @@ func (s *server) handleDice() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleCoin() http.HandlerFunc {
+func (s *server) handleCoin(format string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		type answer struct {
 			Result int    `json:"result"`
 			Side   string `json:"side"`
-		}
-
-		q := r.URL.Query()
-
-		format := q.Get("format")
-
-		if format == "" {
-			format = "json"
 		}
 
 		code := onetimecode.NewNumericalCode(

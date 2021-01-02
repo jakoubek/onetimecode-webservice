@@ -6,19 +6,11 @@ import (
 	"net/http"
 )
 
-func (s *server) handleKsuid() http.HandlerFunc {
+func (s *server) handleKsuid(format string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		type answer struct {
 			Result string `json:"result"`
-		}
-
-		q := r.URL.Query()
-
-		format := q.Get("format")
-
-		if format == "" {
-			format = "json"
 		}
 
 		code := algorithm.NewKsuid()
