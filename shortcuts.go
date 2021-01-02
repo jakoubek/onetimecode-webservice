@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/jakoubek/onetimecode"
 	"net/http"
 	"strconv"
@@ -61,9 +62,10 @@ func (s *server) handleCoin(format string) http.HandlerFunc {
 		}
 
 		if format == "txt" {
+			resultString := fmt.Sprintf("coin: %d\nside: %s\n", code.NumberCode(), coinResult)
 			w.Header().Set("Content-Type", "text/plain")
 			w.WriteHeader(http.StatusOK)
-			w.Write([]byte((strconv.FormatInt(code.NumberCode(), 10))))
+			w.Write([]byte(resultString))
 		} else {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
