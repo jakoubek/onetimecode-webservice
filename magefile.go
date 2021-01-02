@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"path"
 
@@ -24,9 +25,14 @@ var (
 // If not set, running mage will list available targets
 var Default = Build
 
+func initVars() {
+	os.Setenv("CGO_ENABLED", "0")
+}
+
 // Build executable
 func Build() error {
 	fmt.Println("Building...")
+	initVars()
 
 	versionCmd := exec.Command("git", "rev-parse", "--short", "HEAD")
 	version, err := versionCmd.Output()

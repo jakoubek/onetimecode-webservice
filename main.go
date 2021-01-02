@@ -46,8 +46,10 @@ func (s *server) handleIndex() http.HandlerFunc {
 			Info   string `json:"info"`
 		}{
 			Result: "OK",
-			Info:   "Go to https://www.onetimecode.net for information on how to access the API. See /status for API health.",
+			Info:   "Go to https://github.com/jakoubek/onetimecode-webservice for information on how to access the API. See /status for API stats.",
 		}
+		//Info:   "Go to https://www.onetimecode.net for information on how to access the API. See /status for API health.",
+
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(response)
