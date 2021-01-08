@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path"
 
+	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 )
 
@@ -47,7 +48,7 @@ func Build() error {
 
 // Deploy to server
 func Deploy() error {
-	//mg.Deps(Build)
+	mg.Deps(Build)
 	fmt.Println("Deploying...")
 
 	cmd := exec.Command("scp", path.Join(BUILD_DIR, BUILD_BINARY), DEPLOY_TARGET)
