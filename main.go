@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
+	"sort"
 )
 
 var version string
@@ -22,7 +24,8 @@ func main() {
 
 func (s *server) setupRoutes() {
 	s.router.HandleFunc("/", s.logRequest(s.handleIndex()))
-	s.router.HandleFunc("/status", s.logRequest(s.handleStatus()))
+	s.router.HandleFunc("/status", s.logRequest(s.handleStatus("")))
+	s.router.HandleFunc("/status.txt", s.logRequest(s.handleStatus("txt")))
 	s.router.HandleFunc("/healthz", s.handleHealthz())
 	s.router.HandleFunc("/number", s.logRequest(s.handleNumber("json")))
 	s.router.HandleFunc("/number.txt", s.logRequest(s.handleNumber("txt")))
@@ -56,15 +59,38 @@ func (s *server) handleIndex() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleStatus() http.HandlerFunc {
+func (s *server) handleStatus(format string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		//Result:        "OK",
 		//Info:          "API fully operational",
 
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(s.logInfo)
+		if format == "txt" {
+			sort.SliceStable(s.logInfo.Routes, func(i, j int) bool {
+				return s.logInfo.Routes[i].RouteName < s.logInfo.Routes[j].RouteName
+			})
+			var response string
+			response = "STATUS\n"
+			response += fmt.Sprintf("- Server started: %s\n", s.logInfo.ServerStartedAt.Format("2006-01-02 15:04:06"))
+			response += fmt.Sprintf("- Requests      : %3d\n", s.logInfo.Requests)
+			response += fmt.Sprintf("- Last request  : %s\n", s.logInfo.LastRequestAt.Format("2006-01-02 15:04:06"))
+			response += "\nROUTES\n"
+			for _, r := range s.logInfo.Routes {
+				response += fmt.Sprintf(
+					"- %-14s: %3d\n",
+					r.RouteName,
+					r.Requests,
+				)
+			}
+
+			w.Header().Set("Content-Type", "text/plain")
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(response))
+		} else {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(s.logInfo)
+		}
 	}
 }
 
