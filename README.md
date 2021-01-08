@@ -10,7 +10,7 @@ curl -X GET 'https://api.onetimecode.net/number'
 
 curl -X GET 'https://api.onetimecode.net/number?length=10'
 
-curl -X GET 'https://api.onetimecode.net/number?format=txt'
+curl -X GET 'https://api.onetimecode.net/number.txt'
 
 curl -X GET 'https://api.onetimecode.net/alphanumeric'
 
@@ -64,8 +64,7 @@ Instead of the `length` parameter you can submit a pair of `min` and `max` param
 
 ### format
 
-The `format` parameter determines the format of the response. Default is `json` - it returns a JSON object.
-The only other format `txt` returns only the onetimecode as a text/plain answer.
+Append a `.txt` to the route name (i.e. `/alphanumeric.txt?length=12`) to get the result as a plain text.
 
 ## Installation
 
