@@ -1,0 +1,54 @@
+package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
+)
+
+type logRequestBody struct {
+	Name          string `json:"name"`
+	Url           string `json:"url"`
+	Domain        string `json:"domain"`
+	RemoteAddress string `json:"-"`
+	path          string `json:"-"`
+}
+
+func NewLogRequestBody(path string, address string) *logRequestBody {
+	return &logRequestBody{
+		Name:          "pageview",
+		Url:           fmt.Sprintf("https://api.onetimecode.net%s", path),
+		Domain:        "api.onetimecode.net",
+		RemoteAddress: address,
+		path:          path,
+	}
+}
+
+func logRequestToPlausible(lrb *logRequestBody) {
+
+	//log.Println("Logging request:", lrb.path)
+
+	postBody, err := json.Marshal(lrb)
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	responseBody := bytes.NewBuffer(postBody)
+
+	//Leverage Go's HTTP Post function to make request
+
+	request, err := http.NewRequest("POST", "https://plausible.io/api/event", responseBody)
+	request.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	request.Header.Set("User-Agent", "API")
+	request.Header.Set("X-Forwarded-For", lrb.RemoteAddress)
+
+	client := &http.Client{}
+	response, error := client.Do(request)
+	if error != nil {
+		log.Fatalf("An Error Occured %v", err)
+	}
+	defer response.Body.Close()
+
+}

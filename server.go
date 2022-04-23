@@ -57,11 +57,11 @@ func NewServer(serverName, counterFile string) *server {
 // with default values.
 func (s *server) InitLogStruct() {
 	s.logInfo = &logStruct{
-		ServerStartedAt: time.Now().UTC(),
 		Requests: 0,
 		Routes:   nil,
 	}
 	s.readCounterFile()
+	s.logInfo.ServerStartedAt = time.Now().UTC()
 }
 
 // initLogWriter is a separate goroutine that writes
@@ -83,10 +83,10 @@ func (s *server) initLogWriter() {
 func (s *server) logRequest(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		s.logRouteRequest(r.URL.Path)
-		t1 := time.Now()
+		//t1 := time.Now()
 		next.ServeHTTP(w, r)
-		t2 := time.Now()
-		log.Printf("[%s] %q %v\n", r.Method, r.URL.String(), t2.Sub(t1))
+		//t2 := time.Now()
+		//log.Printf("[%s] %q %v\n", r.Method, r.URL.String(), t2.Sub(t1))
 	}
 }
 

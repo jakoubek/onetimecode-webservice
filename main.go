@@ -20,26 +20,35 @@ func main() {
 	s.setupRoutes()
 
 	http.ListenAndServe(getServerPort(), s.router)
+
+	s.logger.Println("Server is being shut down...")
+
 }
 
 func (s *server) setupRoutes() {
-	s.router.HandleFunc("/", s.logRequest(s.handleIndex()))
-	s.router.HandleFunc("/status", s.logRequest(s.handleStatus("")))
-	s.router.HandleFunc("/status.txt", s.logRequest(s.handleStatus("txt")))
-	s.router.HandleFunc("/healthz", s.handleHealthz())
-	s.router.HandleFunc("/number", s.logRequest(s.handleNumber("json")))
-	s.router.HandleFunc("/number.txt", s.logRequest(s.handleNumber("txt")))
-	s.router.HandleFunc("/alphanumeric", s.logRequest(s.handleAlphanumeric("json")))
-	s.router.HandleFunc("/alphanumeric.txt", s.logRequest(s.handleAlphanumeric("txt")))
-	s.router.HandleFunc("/ksuid", s.logRequest(s.handleKsuid("json")))
-	s.router.HandleFunc("/ksuid.txt", s.logRequest(s.handleKsuid("txt")))
-	s.router.HandleFunc("/uuid", s.logRequest(s.handleUuid("json")))
-	s.router.HandleFunc("/uuid.txt", s.logRequest(s.handleUuid("txt")))
-	s.router.HandleFunc("/dice", s.logRequest(s.handleDice("json")))
-	s.router.HandleFunc("/dice.txt", s.logRequest(s.handleDice("txt")))
-	s.router.HandleFunc("/coin", s.logRequest(s.handleCoin("json")))
-	s.router.HandleFunc("/coin.txt", s.logRequest(s.handleCoin("txt")))
-	s.router.NotFoundHandler = s.handleNotFound()
+
+	svcRoutes := s.router.Methods("GET").Subrouter()
+	svcRoutes.HandleFunc("/number", s.logRequest(s.handleNumber("json")))
+	svcRoutes.HandleFunc("/number.txt", s.logRequest(s.handleNumber("txt")))
+	svcRoutes.HandleFunc("/alphanumeric", s.logRequest(s.handleAlphanumeric("json")))
+	svcRoutes.HandleFunc("/alphanumeric.txt", s.logRequest(s.handleAlphanumeric("txt")))
+	svcRoutes.HandleFunc("/ksuid", s.logRequest(s.handleKsuid("json")))
+	svcRoutes.HandleFunc("/ksuid.txt", s.logRequest(s.handleKsuid("txt")))
+	svcRoutes.HandleFunc("/uuid", s.logRequest(s.handleUuid("json")))
+	svcRoutes.HandleFunc("/uuid.txt", s.logRequest(s.handleUuid("txt")))
+	svcRoutes.HandleFunc("/dice", s.logRequest(s.handleDice("json")))
+	svcRoutes.HandleFunc("/dice.txt", s.logRequest(s.handleDice("txt")))
+	svcRoutes.HandleFunc("/coin", s.logRequest(s.handleCoin("json")))
+	svcRoutes.HandleFunc("/coin.txt", s.logRequest(s.handleCoin("txt")))
+	svcRoutes.Use(LogRequestMiddleware)
+
+	baseRoutes := s.router.Methods("GET").Subrouter()
+	baseRoutes.HandleFunc("/", s.logRequest(s.handleIndex()))
+	baseRoutes.HandleFunc("/status", s.logRequest(s.handleStatus("")))
+	baseRoutes.HandleFunc("/status.txt", s.logRequest(s.handleStatus("txt")))
+	baseRoutes.HandleFunc("/healthz", s.handleHealthz())
+	baseRoutes.NotFoundHandler = s.handleNotFound()
+
 }
 
 func (s *server) handleIndex() http.HandlerFunc {
