@@ -8,13 +8,19 @@ import (
 	"sort"
 )
 
-var version string
+var (
+	version      string
+	buildVersion string
+	buildTime    string
+	fullCommit   string
+	isDebugMode  string = "false"
+)
 
 func main() {
 
 	s := NewServer("Onetimecode-API 1.0", getCounterfile())
 
-	s.logger.Printf("Server Version %s is starting on %s...", version, getServerPort())
+	s.logger.Printf("Server Version %s is starting on %s...", buildVersion, getServerPort())
 	s.logger.Printf("Counter file: %s...", getCounterfile())
 
 	s.setupRoutes()
