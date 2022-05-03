@@ -21,8 +21,6 @@ func main() {
 
 	http.ListenAndServe(getServerPort(), s.router)
 
-	s.logger.Println("Server is being shut down...")
-
 }
 
 func (s *server) setupRoutes() {
@@ -97,6 +95,7 @@ func (s *server) handleStatus(format string) http.HandlerFunc {
 			w.Write([]byte(response))
 		} else {
 			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(s.logInfo)
 		}
@@ -113,6 +112,7 @@ func (s *server) handleHealthz() http.HandlerFunc {
 			Info:   "API fully operational",
 		}
 		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(response)
 	}

@@ -25,10 +25,12 @@ func (s *server) handleDice(format string) http.HandlerFunc {
 
 		if format == "txt" {
 			w.Header().Set("Content-Type", "text/plain")
+			w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte((strconv.FormatInt(code.NumberCode(), 10))))
 		} else {
 			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(result)
 		}
@@ -64,10 +66,12 @@ func (s *server) handleCoin(format string) http.HandlerFunc {
 		if format == "txt" {
 			resultString := fmt.Sprintf("coin: %d\nside: %s\n", code.NumberCode(), coinResult)
 			w.Header().Set("Content-Type", "text/plain")
+			w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 			w.WriteHeader(http.StatusOK)
 			w.Write([]byte(resultString))
 		} else {
 			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(result)
 		}
