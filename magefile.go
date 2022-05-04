@@ -5,32 +5,35 @@ package main
 
 import (
 	"fmt"
+	_ "github.com/joho/godotenv/autoload"
+	"github.com/zhiminwen/magetool/sshkit"
 	"log"
 	"os"
 	"os/exec"
 	"path"
 	"time"
 
-	"github.com/zhiminwen/magetool/sshkit"
-
 	"github.com/magefile/mage/mg"
 	sh "github.com/magefile/mage/sh"
 )
 
-const (
-	BUILD_DIR          string = "./bin"
-	BUILD_BINARY       string = "onetimecode-server"
-	BUILD_BINARY_LOCAL string = "onetimecode-server-debug.exe"
-	DEPLOY_TARGET      string = "oli@opal5.opalstack.com:apps/onetimecode/onetimecode-server.new"
-	DEPLOY_DIR         string = "oli@opal5.opalstack.com:apps/onetimecode/"
-	SSH_CONNECT        string = "oli@opal5.opalstack.com"
-)
-
 var (
+	buildDir         string
+	buildBinary      string
+	buildBinaryLocal string
+	deployTarget     string
+	deployDir        string
+	sshConnect       string
+	sshPort          string
+	sshUser          string
+	sshKeyfile       string
+
 	buildVersion string
 	fullCommit   string
 	buildTime    string
 )
+
+var Default = Debugrun
 
 func setBuildVariables() {
 	versionCmd := exec.Command("git", "rev-parse", "--short", "HEAD")
@@ -55,7 +58,7 @@ func RestartService() error {
 
 	fmt.Println("Restarting webserver on production server...")
 
-	productionServer, err := sshkit.NewSSHClient("opal5.opalstack.com", "22", "oli", "", "C:\\Users\\jakoubek\\.ssh\\id_rsa")
+	productionServer, err := sshkit.NewSSHClient(sshConnect, sshPort, sshUser, "", sshKeyfile)
 	if err != nil {
 		return err
 	}
@@ -80,12 +83,12 @@ func Deploy() error {
 
 	mg.Deps(Build)
 
-	binaryPath := path.Join(BUILD_DIR, BUILD_BINARY)
+	binaryPath := path.Join(buildDir, buildBinaryLocal)
 
 	fmt.Println("Deploying to production server...")
 
 	fmt.Println("Copying webserver binary...")
-	err := sh.Run("scp", binaryPath, DEPLOY_TARGET)
+	err := sh.Run("scp", binaryPath, deployTarget)
 	if err != nil {
 		return err
 	}
@@ -99,7 +102,7 @@ func Build() error {
 
 	mg.Deps(Prepare)
 
-	buildPath := path.Join(BUILD_DIR, BUILD_BINARY)
+	buildPath := path.Join(buildDir, buildBinary)
 
 	setBuildVariables()
 
@@ -114,13 +117,13 @@ func Debugrun() error {
 
 	mg.Deps(Prepare)
 
-	buildPath := path.Join(BUILD_DIR, BUILD_BINARY_LOCAL)
+	buildPath := path.Join(buildDir, buildBinaryLocal)
 
 	setBuildVariables()
 
 	fmt.Printf("Building and running locally %s...\n", buildPath)
 
-	sh.RunWith(map[string]string{"GOOS": "windows"}, "go", "build", "-ldflags", "-s -X main.buildVersion="+buildVersion+" -X main.fullCommit="+fullCommit+" -X main.buildTime="+buildTime+" -X main.isDebugMode=true", "-o", buildPath, "./cmd/server/")
+	sh.RunWith(map[string]string{"GOOS": "windows"}, "go", "build", "-ldflags", "-s -X main.buildVersion="+buildVersion+" -X main.fullCommit="+fullCommit+" -X main.buildTime="+buildTime+" -X main.isDebugMode=true", "-o", buildPath, ".")
 	//sh.RunWith(map[string]string{"GOOS": "windows"}, "go", "build", "-o", buildPath, "./cmd/server/")
 
 	//cmd := exec.Command("go", "build", "-o", buildPath, "./cmd/server/")
@@ -134,16 +137,31 @@ func Debugrun() error {
 	return err
 }
 
+func LoadEnvironment() {
+	fmt.Println("Loading environment variables...")
+	buildDir = os.Getenv("BUILD_DIR")
+	buildBinary = os.Getenv("BUILD_BINARY")
+	buildBinaryLocal = os.Getenv("BUILD_BINARY_LOCAL")
+	deployTarget = os.Getenv("DEPLOY_TARGET")
+	deployDir = os.Getenv("DEPLOY_DIR")
+	sshConnect = os.Getenv("SSH_CONNECT")
+	sshPort = os.Getenv("SSH_PORT")
+	sshUser = os.Getenv("SSH_USER")
+	sshKeyfile = os.Getenv("SSH_KEYFILE")
+}
+
 // Prepare directory for builds
 func Prepare() {
-	fmt.Printf("Prepare %s directory...\n", BUILD_DIR)
-	if err := os.Mkdir(BUILD_DIR, os.ModePerm); err != nil {
-		log.Printf("Creating %s directory didn't work: ", BUILD_DIR, err.Error())
+	mg.Deps(LoadEnvironment)
+	fmt.Printf("Prepare %s directory...\n", buildDir)
+	if err := os.Mkdir(buildDir, os.ModePerm); err != nil {
+		log.Printf("Creating %s directory didn't work: ", buildDir, err.Error())
 	}
 }
 
 // Clean up after yourself
 func Clean() {
+	mg.Deps(LoadEnvironment)
 	fmt.Println("Cleaning...")
-	os.RemoveAll("bin")
+	os.RemoveAll(buildDir)
 }
