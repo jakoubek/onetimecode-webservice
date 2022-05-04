@@ -1,24 +1,20 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	_ "github.com/joho/godotenv/autoload"
 	"io"
 	"log"
-	"net/http"
 	"os"
-	"sort"
 	"time"
 )
 
 type config struct {
-	port            int
-	env             string
-	logfilePath     string
-	counterfilePath string
-	limiter         struct {
+	port        int
+	env         string
+	logfilePath string
+	limiter     struct {
 		rps     float64
 		burst   int
 		enabled bool
@@ -39,7 +35,6 @@ func main() {
 	flag.IntVar(&cfg.port, "port", 4000, "Web server port")
 	flag.StringVar(&cfg.env, "env", "development", "Environment (development|staging|production)")
 	flag.StringVar(&cfg.logfilePath, "logfile", "./logfile.log", "Path and name of logfile")
-	flag.StringVar(&cfg.counterfilePath, "counterfile", "", "Path and name of JSON counterfile")
 
 	flag.Float64Var(&cfg.limiter.rps, "limiter-rps", 1, "Rate limiter maximum requests per second")
 	flag.IntVar(&cfg.limiter.burst, "limiter-burst", 3, "Rate limiter maximum burst")
@@ -66,72 +61,9 @@ func main() {
 		logger:      logger,
 	}
 
-	srv := &http.Server{
-		Addr:         fmt.Sprintf(":%d", cfg.port),
-		Handler:      app.routes(),
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 30 * time.Second,
-		IdleTimeout:  time.Minute,
+	err = app.serve()
+	if err != nil {
+		logger.Fatalln(err)
 	}
 
-	logger.Printf("Starting %s server on %s", cfg.env, srv.Addr)
-	logger.Printf("Server version %s (%s)", buildVersion, buildTime)
-	err = srv.ListenAndServe()
-	logger.Fatal(err)
-
-}
-
-func (s *server) setupRoutes() {
-
-	//svcRoutes := s.router.Methods("GET").Subrouter()
-	//svcRoutes.HandleFunc("/number", s.logRequest(s.handleNumber("json")))
-	//svcRoutes.HandleFunc("/number.txt", s.logRequest(s.handleNumber("txt")))
-	//svcRoutes.HandleFunc("/alphanumeric", s.logRequest(s.handleAlphanumeric("json")))
-	//svcRoutes.HandleFunc("/alphanumeric.txt", s.logRequest(s.handleAlphanumeric("txt")))
-	//svcRoutes.HandleFunc("/ksuid", s.logRequest(s.handleKsuid("json")))
-	//svcRoutes.HandleFunc("/ksuid.txt", s.logRequest(s.handleKsuid("txt")))
-	//svcRoutes.HandleFunc("/uuid", s.logRequest(s.handleUuid("json")))
-	//svcRoutes.HandleFunc("/uuid.txt", s.logRequest(s.handleUuid("txt")))
-	//svcRoutes.HandleFunc("/dice", s.logRequest(s.handleDice("json")))
-	//svcRoutes.HandleFunc("/dice.txt", s.logRequest(s.handleDice("txt")))
-	//svcRoutes.HandleFunc("/coin", s.logRequest(s.handleCoin("json")))
-	//svcRoutes.HandleFunc("/coin.txt", s.logRequest(s.handleCoin("txt")))
-	//svcRoutes.Use(LogRequestMiddleware)
-
-}
-
-func (s *server) handleStatus(format string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-
-		//Result:        "OK",
-		//Info:          "API fully operational",
-
-		if format == "txt" {
-			sort.SliceStable(s.logInfo.Routes, func(i, j int) bool {
-				return s.logInfo.Routes[i].RouteName < s.logInfo.Routes[j].RouteName
-			})
-			var response string
-			response = "STATUS\n"
-			response += fmt.Sprintf("- Server started: %s\n", s.logInfo.ServerStartedAt.Format("2006-01-02 15:04:06"))
-			response += fmt.Sprintf("- Requests      : %3d\n", s.logInfo.Requests)
-			response += fmt.Sprintf("- Last request  : %s\n", s.logInfo.LastRequestAt.Format("2006-01-02 15:04:06"))
-			response += "\nROUTES\n"
-			for _, r := range s.logInfo.Routes {
-				response += fmt.Sprintf(
-					"- %-14s: %3d\n",
-					r.RouteName,
-					r.Requests,
-				)
-			}
-
-			w.Header().Set("Content-Type", "text/plain")
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(response))
-		} else {
-			w.Header().Set("Content-Type", "application/json")
-			w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
-			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(s.logInfo)
-		}
-	}
 }

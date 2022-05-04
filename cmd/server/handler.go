@@ -29,7 +29,7 @@ func (app *application) healthcheckHandler(w http.ResponseWriter, r *http.Reques
 		"status": "OK",
 		"info":   "API fully operational",
 	}
-
+	
 	err := app.writeJSON(w, http.StatusOK, data, nil)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
