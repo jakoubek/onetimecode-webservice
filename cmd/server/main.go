@@ -1,12 +1,14 @@
 package main
 
 import (
+	"expvar"
 	"flag"
 	"fmt"
 	_ "github.com/joho/godotenv/autoload"
 	"io"
 	"log"
 	"os"
+	"runtime"
 	"time"
 )
 
@@ -19,6 +21,7 @@ type config struct {
 		burst   int
 		enabled bool
 	}
+	securekey string
 }
 
 type application struct {
@@ -40,6 +43,8 @@ func main() {
 	flag.IntVar(&cfg.limiter.burst, "limiter-burst", 3, "Rate limiter maximum burst")
 	flag.BoolVar(&cfg.limiter.enabled, "limiter-enabled", true, "Enable rate limiter")
 
+	flag.StringVar(&cfg.securekey, "securekey", "", "Securekey for accessing the metrics endpoint")
+
 	flag.Parse()
 
 	// Setup logger
@@ -60,6 +65,17 @@ func main() {
 		startupTime: time.Now(),
 		logger:      logger,
 	}
+
+	expvar.NewString("version").Set(version)
+	expvar.NewString("buildVersion").Set(buildVersion)
+	expvar.NewString("buildTime").Set(buildTime)
+	expvar.NewString("serverStartupTime").Set(app.startupTime.String())
+	expvar.Publish("goroutines", expvar.Func(func() interface{} {
+		return runtime.NumGoroutine()
+	}))
+	expvar.Publish("timestamp", expvar.Func(func() interface{} {
+		return time.Now().Unix()
+	}))
 
 	err = app.serve()
 	if err != nil {

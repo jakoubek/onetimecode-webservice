@@ -1,6 +1,7 @@
 package main
 
 import (
+	"expvar"
 	"github.com/go-chi/chi/v5"
 
 	"net/http"
@@ -28,6 +29,12 @@ func (app *application) routes() http.Handler {
 		router.Get("/uuid", app.uuidHandler)
 		router.Get("/dice", app.diceHandler)
 		router.Get("/coin", app.coinHandler)
+	})
+
+	router.Group(func(router chi.Router) {
+		router.Use(app.checkSecureKey)
+
+		router.Handle("/debug/vars", expvar.Handler())
 	})
 
 	return router

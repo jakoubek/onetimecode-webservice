@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/jakoubek/onetimecode-webservice/internal"
 	"golang.org/x/time/rate"
@@ -11,6 +12,24 @@ import (
 	"sync"
 	"time"
 )
+
+func (app *application) checkSecureKey(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		if r.URL.Query().Has("key") {
+			key := r.URL.Query().Get("key")
+			app.logger.Println("Key:", key)
+			app.logger.Println("Config-Key:", app.config.securekey)
+			if key == app.config.securekey {
+				next.ServeHTTP(w, r)
+			} else {
+				app.serverErrorResponse(w, r, errors.New("No or wrong key given"))
+			}
+		} else {
+			app.serverErrorResponse(w, r, errors.New("No key given"))
+		}
+	})
+}
 
 func (app *application) rateLimit(next http.Handler) http.Handler {
 

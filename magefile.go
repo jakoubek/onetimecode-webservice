@@ -27,6 +27,7 @@ var (
 	sshPort          string
 	sshUser          string
 	sshKeyfile       string
+	secureKey        string
 
 	buildVersion string
 	fullCommit   string
@@ -127,7 +128,7 @@ func Debugrun() error {
 
 	sh.RunWith(map[string]string{"GOOS": "windows"}, "go", "build", "-ldflags", "-s -X main.buildVersion="+buildVersion+" -X main.fullCommit="+fullCommit+" -X main.buildTime="+buildTime+" -X main.isDebugMode=true", "-o", buildPath, "./cmd/server/")
 
-	err := sh.Run(buildPath, "env", "development")
+	err := sh.Run(buildPath, "-env", "staging", "-securekey", secureKey)
 
 	return err
 }
@@ -143,6 +144,7 @@ func LoadEnvironment() {
 	sshPort = os.Getenv("SSH_PORT")
 	sshUser = os.Getenv("SSH_USER")
 	sshKeyfile = os.Getenv("SSH_KEYFILE")
+	secureKey = os.Getenv("SECUREKEY")
 }
 
 // Prepare directory for builds
