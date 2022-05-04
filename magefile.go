@@ -65,7 +65,7 @@ func RestartService() error {
 		return err
 	}
 
-	err = productionServer.Execute("cd apps/onetimecode && ./restart")
+	err = productionServer.Execute("cd apps/onetimecode && ./update")
 	if err != nil {
 		return err
 	}
