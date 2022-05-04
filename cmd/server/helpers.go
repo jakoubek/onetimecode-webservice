@@ -37,6 +37,8 @@ type reqParams struct {
 	max           int
 	caseStr       string
 	withoutdashes bool
+	groupBy       string
+	groupEvery    int
 }
 
 func (app *application) readRequestParameters(r *http.Request) (reqParams, error) {
@@ -47,6 +49,8 @@ func (app *application) readRequestParameters(r *http.Request) (reqParams, error
 		max:           -1,
 		caseStr:       "",
 		withoutdashes: false,
+		groupBy:       "",
+		groupEvery:    -1,
 	}
 
 	if r.URL.Query().Has("length") {
@@ -83,6 +87,20 @@ func (app *application) readRequestParameters(r *http.Request) (reqParams, error
 
 	if r.URL.Query().Has("withoutdashes") {
 		rp.withoutdashes = true
+	}
+
+	if r.URL.Query().Has("group_by") {
+		groupByStr := r.URL.Query().Get("group_by")
+		rp.groupBy = strings.TrimSpace(strings.ToLower(groupByStr))
+	}
+
+	if r.URL.Query().Has("group_every") {
+		groupEveryStr := r.URL.Query().Get("group_every")
+		groupEvery, err := strconv.Atoi(groupEveryStr)
+		if err != nil {
+			return rp, errors.New(fmt.Sprintf("invalid group_every parameter (%s)", groupEveryStr))
+		}
+		rp.groupEvery = groupEvery
 	}
 
 	return rp, nil

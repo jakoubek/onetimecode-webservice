@@ -47,6 +47,7 @@ func (app *application) numberHandler(w http.ResponseWriter, r *http.Request) {
 		internal.WithLength(rp.length),
 		internal.WithMin(rp.min),
 		internal.WithMax(rp.max),
+		internal.WithGrouping(rp.groupEvery, rp.groupBy),
 	)
 
 	data := envelope{
@@ -69,6 +70,7 @@ func (app *application) alphanumericHandler(w http.ResponseWriter, r *http.Reque
 	otc := internal.NewAlphanumericalCode(
 		internal.WithLength(rp.length),
 		internal.WithCase(rp.caseStr),
+		internal.WithGrouping(rp.groupEvery, rp.groupBy),
 	)
 
 	data := envelope{

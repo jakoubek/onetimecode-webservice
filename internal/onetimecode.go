@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"bytes"
 	"github.com/google/uuid"
 	"github.com/segmentio/ksuid"
 	"math"
@@ -29,6 +30,9 @@ type Onetimecode struct {
 	max           int
 	ulmcase       int
 	withoutDashes bool
+	groupBy       string
+	groupEvery    int
+	groupingMode  bool
 	code          int64
 	stringCode    string
 }
@@ -108,6 +112,26 @@ func WithoutDashes() OnetimecodeConfig {
 	}
 }
 
+func WithGrouping(groupEvery int, groupBy string) OnetimecodeConfig {
+	return func(code *Onetimecode) {
+		if groupEvery > -1 || groupBy != "" {
+			if groupEvery < code.length {
+				if groupEvery > -1 {
+					code.groupEvery = groupEvery
+				} else {
+					code.groupEvery = 4
+				}
+				if groupBy != "" {
+					code.groupBy = groupBy
+				} else {
+					code.groupBy = "-"
+				}
+				code.groupingMode = true
+			}
+		}
+	}
+}
+
 func NewNumericalCode(opts ...OnetimecodeConfig) *Onetimecode {
 	otc := &Onetimecode{
 		codeType: ANumberedCode,
@@ -119,6 +143,9 @@ func NewNumericalCode(opts ...OnetimecodeConfig) *Onetimecode {
 		opt(otc)
 	}
 	otc.defineValueNumeric()
+	if otc.groupingMode {
+		otc.applyGrouping()
+	}
 	return otc
 }
 
@@ -132,6 +159,9 @@ func NewAlphanumericalCode(opts ...OnetimecodeConfig) *Onetimecode {
 		opt(otc)
 	}
 	otc.defineValueAlphanumeric()
+	if otc.groupingMode {
+		otc.applyGrouping()
+	}
 	return otc
 }
 
@@ -178,6 +208,19 @@ func (otc *Onetimecode) defineValueNumeric() {
 
 func (otc *Onetimecode) defineValueAlphanumeric() {
 	otc.stringCode = alphaNumberCode(otc.length, otc.ulmcase)
+}
+
+func (otc *Onetimecode) applyGrouping() {
+	var buffer bytes.Buffer
+	before := otc.groupEvery - 1
+	last := len(otc.stringCode) - 1
+	for i, char := range otc.stringCode {
+		buffer.WriteRune(char)
+		if i%otc.groupEvery == before && i != last {
+			buffer.WriteRune([]rune(otc.groupBy)[0])
+		}
+	}
+	otc.stringCode = buffer.String()
 }
 
 // AlphaNumberCode returns an alphanumeric randomized
