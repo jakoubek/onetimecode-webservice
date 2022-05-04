@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
@@ -22,18 +21,18 @@ type server struct {
 
 // logStruct is a struct for the log info structure
 type logStruct struct {
-	ServerStartedAt time.Time `json:"server_started"`
-	Requests int              `json:"requests"`
-	LastRequestAt time.Time   `json:"lastrequest"`
-	Routes []*logRoute        `json:"routes"`
-	isDirty bool
+	ServerStartedAt time.Time   `json:"server_started"`
+	Requests        int         `json:"requests"`
+	LastRequestAt   time.Time   `json:"lastrequest"`
+	Routes          []*logRoute `json:"routes"`
+	isDirty         bool
 }
 
 // logRoute is a struct for logging the requests
 // to one route
 type logRoute struct {
-	RouteName string `json:"route"`
-	Requests int `json:"requests"`
+	RouteName     string    `json:"route"`
+	Requests      int       `json:"requests"`
 	LastRequestAt time.Time `json:"lastrequest"`
 }
 
@@ -104,32 +103,14 @@ func (s *server) logRouteRequest(routeName string) {
 	}
 	if found == false {
 		s.logInfo.Routes = append(s.logInfo.Routes, &logRoute{
-			RouteName: routeName,
-			Requests:  1,
+			RouteName:     routeName,
+			Requests:      1,
 			LastRequestAt: time.Now().UTC(),
 		})
 	}
 	s.logInfo.Requests++
 	s.logInfo.LastRequestAt = time.Now().UTC()
 	s.logInfo.isDirty = true
-}
-
-// handleNotFound is the handler function to respond
-// on requests for not defined routes.
-func (s *server) handleNotFound() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		s.logRouteRequest("/notfound")
-		response := struct {
-			Code string `json:code`
-			Message string `json:message`
-		}{
-			Code: "404",
-			Message: fmt.Sprintf("Route %s not found", r.URL.Path),
-		}
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(response)
-	}
 }
 
 // readCounterFile reads the from the counterFile JSON file (if existing)

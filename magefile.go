@@ -110,7 +110,7 @@ func Build() error {
 
 	fmt.Printf("Building %s...\n", buildPath)
 
-	return sh.RunWith(map[string]string{"GOOS": "linux"}, "go", "build", "-ldflags", "-s -X main.buildVersion="+buildVersion+" -X main.fullCommit="+fullCommit+" -X main.buildTime="+buildTime, "-o", buildPath, ".")
+	return sh.RunWith(map[string]string{"GOOS": "linux"}, "go", "build", "-ldflags", "-s -X main.buildVersion="+buildVersion+" -X main.fullCommit="+fullCommit+" -X main.buildTime="+buildTime, "-o", buildPath, "./cmd/server/")
 
 }
 
@@ -125,17 +125,10 @@ func Debugrun() error {
 
 	fmt.Printf("Building and running locally %s...\n", buildPath)
 
-	sh.RunWith(map[string]string{"GOOS": "windows"}, "go", "build", "-ldflags", "-s -X main.buildVersion="+buildVersion+" -X main.fullCommit="+fullCommit+" -X main.buildTime="+buildTime+" -X main.isDebugMode=true", "-o", buildPath, ".")
-	//sh.RunWith(map[string]string{"GOOS": "windows"}, "go", "build", "-o", buildPath, "./cmd/server/")
+	sh.RunWith(map[string]string{"GOOS": "windows"}, "go", "build", "-ldflags", "-s -X main.buildVersion="+buildVersion+" -X main.fullCommit="+fullCommit+" -X main.buildTime="+buildTime+" -X main.isDebugMode=true", "-o", buildPath, "./cmd/server/")
 
-	//cmd := exec.Command("go", "build", "-o", buildPath, "./cmd/server/")
-	//cmd.Run()
+	err := sh.Run(buildPath, "env", "development")
 
-	err := sh.Run(buildPath)
-
-	//cmd = exec.Command(buildPath)
-
-	//return cmd.Run()
 	return err
 }
 

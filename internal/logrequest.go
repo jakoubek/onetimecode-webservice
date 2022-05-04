@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"bytes"
@@ -26,7 +26,7 @@ func NewLogRequestBody(path string, address string) *logRequestBody {
 	}
 }
 
-func logRequestToPlausible(lrb *logRequestBody) {
+func LogRequestToPlausible(lrb *logRequestBody) {
 
 	//log.Println("Logging request:", lrb.path)
 
