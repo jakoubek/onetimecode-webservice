@@ -26,4 +26,5 @@ require (
 	github.com/zhiminwen/quote v0.0.0-20210113173315-5a6f3293124e // indirect
 	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f // indirect
 	golang.org/x/sys v0.0.0-20220503163025-988cb79eb6c6 // indirect
+	golang.org/x/time v0.0.0-20220411224347-583f2d630306 // indirect
 )

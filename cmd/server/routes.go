@@ -10,6 +10,7 @@ func (app *application) routes() http.Handler {
 	router := chi.NewRouter()
 
 	router.Use(app.recoverPanic)
+	router.Use(app.rateLimit)
 	router.Use(app.enableCORS)
 
 	router.NotFound(http.HandlerFunc(app.notFoundResponse))
