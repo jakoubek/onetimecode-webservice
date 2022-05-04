@@ -56,6 +56,8 @@ func setBuildVariables() {
 // restart the newly deployed webserver binary on the production server
 func RestartService() error {
 
+	mg.Deps(LoadEnvironment)
+
 	fmt.Println("Restarting webserver on production server...")
 
 	productionServer, err := sshkit.NewSSHClient(sshConnect, sshPort, sshUser, "", sshKeyfile)
@@ -83,7 +85,7 @@ func Deploy() error {
 
 	mg.Deps(Build)
 
-	binaryPath := path.Join(buildDir, buildBinaryLocal)
+	binaryPath := path.Join(buildDir, buildBinary)
 
 	fmt.Println("Deploying to production server...")
 
