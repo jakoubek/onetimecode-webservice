@@ -3,6 +3,8 @@ Webservice for one-time codes. Access the API at https://api.onetimecode.net/.
 
 ## Usage
 
+The base URL for the API is: `https://api.onetimecode.net/`
+
 ### Number codes
 
 ```shell
