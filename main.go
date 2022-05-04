@@ -57,18 +57,7 @@ func (s *server) setupRoutes() {
 
 func (s *server) handleIndex() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		response := struct {
-			Result string `json:"result"`
-			Info   string `json:"info"`
-		}{
-			Result: "OK",
-			Info:   "Go to https://github.com/jakoubek/onetimecode-webservice for information on how to access the API. See /status for API stats.",
-		}
-		//Info:   "Go to https://www.onetimecode.net for information on how to access the API. See /status for API health.",
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(response)
+		http.Redirect(w, r, "https://www.onetimecode.net/?ref=apiroot", http.StatusFound)
 	}
 }
 
