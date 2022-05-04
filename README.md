@@ -18,7 +18,7 @@ curl -X GET 'https://api.onetimecode.net/number?length=10'
 curl -X GET 'https://api.onetimecode.net/number?min=10&max=30'
 {"result":"16"}
 
-# get a number with then length of 12 digits, grouped every 4 digits with a dash
+# get a number with the length of 12 digits, grouped every 4 digits with a dash
 curl -X GET 'https://api.onetimecode.net/number?length=12&group_by=-&group_every=4'
 {"result":"3650-3264-6315"}
 ```
@@ -35,12 +35,16 @@ curl -X GET 'https://api.onetimecode.net/alphanumeric?length=40'
 {"result":"8HrEYY2QPAmaKnrAXE1N6oJM7PgvF8LPnRfhfAym"}
 
 # get an alphanumeric code with the length of 20 with all chars UPPERcased
-curl -X GET 'https://api.onetimecode.net/alphanumeric?length=20&case=uppercase'
+curl -X GET 'https://api.onetimecode.net/alphanumeric?length=20&case=upper'
 {"result":"Q41HQOWcEwUakThSA8U7"}
 
 # get an alphanumeric code with the default length with all chars lowerCASED
-curl -X GET 'https://api.onetimecode.net/alphanumeric?case=lowercase'
+curl -X GET 'https://api.onetimecode.net/alphanumeric?case=lower'
 {"result":"2kf301"}
+
+# get an alphanumeric 40 chars uppercased code, grouped every 4 digits with a dash
+curl -X GET 'https://api.onetimecode.net/alphanumeric?length=40&case=upper&group_by=-&group_every=4'
+{"result":"YG63-6PPZ-WKFU-7GYG-D63W-LG4M-YQ6D-91S2-3N3A-0KZJ"} 
 ```
 
 ### K-Sortable Globally Unique IDs (ksuid)
@@ -74,7 +78,7 @@ curl -X GET 'https://api.onetimecode.net/dice'
 
 #### Toss a coin
 
-Then `/coin` endpoint is an alias for `number?min=0&max=1`. It returns either 0 or 1.
+The `/coin` endpoint is an alias for `number?min=0&max=1`. It returns either 0 or 1.
 The `/coin` endpoint is the only endpoint that returns an additional attribute `side` whereas 0 = *head* and 1 = *tails*.
 
 ```shell
