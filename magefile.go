@@ -6,15 +6,13 @@ package main
 import (
 	"fmt"
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/magefile/mage/mg"
+	sh "github.com/magefile/mage/sh"
 	"github.com/zhiminwen/magetool/sshkit"
 	"log"
 	"os"
-	"os/exec"
 	"path"
 	"time"
-
-	"github.com/magefile/mage/mg"
-	sh "github.com/magefile/mage/sh"
 )
 
 var (
@@ -30,30 +28,10 @@ var (
 	statsApiUrl      string
 	secureKey        string
 
-	buildVersion string
-	fullCommit   string
-	buildTime    string
+	buildTime string
 )
 
 var Default = Debugrun
-
-func setBuildVariables() {
-	versionCmd := exec.Command("git", "rev-parse", "--short", "HEAD")
-	versionCmdOutput, err := versionCmd.Output()
-	if err != nil {
-		log.Fatal(err)
-	}
-	buildVersion = string(versionCmdOutput)
-
-	versionCmd = exec.Command("git", "rev-parse", "HEAD")
-	versionCmdOutput, err = versionCmd.Output()
-	if err != nil {
-		log.Fatal(err)
-	}
-	fullCommit = string(versionCmdOutput)
-
-	buildTime = time.Now().Format("2006-01-02_15:04:05")
-}
 
 // restart the newly deployed webserver binary on the production server
 func RestartService() error {
@@ -108,11 +86,22 @@ func Build() error {
 
 	buildPath := path.Join(buildDir, buildBinary)
 
-	setBuildVariables()
-
 	fmt.Printf("Building %s...\n", buildPath)
 
-	return sh.RunWith(map[string]string{"GOOS": "linux"}, "go", "build", "-ldflags", "-s -X main.buildVersion="+buildVersion+" -X main.fullCommit="+fullCommit+" -X main.buildTime="+buildTime, "-o", buildPath, "./cmd/server/")
+	return sh.RunWith(map[string]string{"GOOS": "linux"}, "go", "build", "-ldflags", "-s -X main.buildTime="+buildTime, "-o", buildPath, "./cmd/server/")
+
+}
+
+// build the binary locally
+func LocalBuild() error {
+
+	mg.Deps(Prepare)
+
+	buildPath := path.Join(buildDir, buildBinaryLocal)
+
+	fmt.Printf("Building locally %s...\n", buildPath)
+
+	return sh.RunWith(map[string]string{"GOOS": "windows"}, "go", "build", "-ldflags", "-s -X main.buildTime="+buildTime, "-o", buildPath, "./cmd/server/")
 
 }
 
@@ -121,13 +110,11 @@ func Debugrun() error {
 
 	mg.Deps(Prepare)
 
+	mg.Deps(LocalBuild)
+
 	buildPath := path.Join(buildDir, buildBinaryLocal)
 
-	setBuildVariables()
-
-	fmt.Printf("Building and running locally %s...\n", buildPath)
-
-	sh.RunWith(map[string]string{"GOOS": "windows"}, "go", "build", "-ldflags", "-s -X main.buildVersion="+buildVersion+" -X main.fullCommit="+fullCommit+" -X main.buildTime="+buildTime+" -X main.isDebugMode=true", "-o", buildPath, "./cmd/server/")
+	fmt.Printf("Running locally %s...\n", buildPath)
 
 	err := sh.Run(buildPath, "-env", "staging", "-securekey", secureKey)
 
@@ -147,6 +134,7 @@ func LoadEnvironment() {
 	sshKeyfile = os.Getenv("SSH_KEYFILE")
 	statsApiUrl = os.Getenv("STATS_API_URL")
 	secureKey = os.Getenv("SECUREKEY")
+	buildTime = time.Now().Format("2006-01-02_15:04:05")
 }
 
 // Prepare directory for builds

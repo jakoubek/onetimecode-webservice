@@ -36,7 +36,7 @@ func (app *application) serve() error {
 	}()
 
 	app.logger.Printf("Starting %s server on %s", app.config.env, srv.Addr)
-	app.logger.Printf("Server version %s (%s)", buildVersion, buildTime)
+	app.logger.Printf("Server version %s (%s)", version, buildTime)
 	err := srv.ListenAndServe()
 	if !errors.Is(err, http.ErrServerClosed) {
 		return err

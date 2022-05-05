@@ -1,9 +1,9 @@
 package main
 
+import "github.com/jakoubek/onetimecode-webservice/internal/vcs"
+
 var (
-	version      string
-	buildVersion string
-	buildTime    string
-	fullCommit   string
-	isDebugMode  string = "false"
+	version     = vcs.Version()
+	buildTime   string
+	isDebugMode string = "false"
 )

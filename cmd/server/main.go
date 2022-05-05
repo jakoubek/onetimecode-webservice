@@ -47,7 +47,17 @@ func main() {
 	flag.StringVar(&cfg.statsApiUrl, "statsapiurl", "", "Endpoint URL for the stats API")
 	flag.StringVar(&cfg.securekey, "securekey", "", "Securekey for accessing the metrics endpoint")
 
+	displayVersion := flag.Bool("version", false, "Display version and exit")
+
 	flag.Parse()
+
+	// If the version flag value is true, then print out the version number and
+	// immediately exit.
+	if *displayVersion {
+		fmt.Printf("Version:\t%s\n", version)
+		fmt.Printf("Built  :\t%s\n", buildTime)
+		os.Exit(0)
+	}
 
 	// Setup logger
 	logfileF, err := os.OpenFile(cfg.logfilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -69,7 +79,6 @@ func main() {
 	}
 
 	expvar.NewString("version").Set(version)
-	expvar.NewString("buildVersion").Set(buildVersion)
 	expvar.NewString("buildTime").Set(buildTime)
 	expvar.NewString("serverStartupTime").Set(app.startupTime.String())
 	expvar.Publish("goroutines", expvar.Func(func() interface{} {
