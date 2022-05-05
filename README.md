@@ -1,5 +1,6 @@
 # onetimecode-webservice
-Webservice for one-time codes. Access the API at https://api.onetimecode.net/.
+
+Webservice for randomized one-time codes. Access the API at https://api.onetimecode.net/.
 
 ## Usage
 
@@ -38,7 +39,7 @@ curl -X GET 'https://api.onetimecode.net/alphanumeric?length=40'
 
 # get an alphanumeric code with the length of 20 with all chars UPPERcased
 curl -X GET 'https://api.onetimecode.net/alphanumeric?length=20&case=upper'
-{"result":"Q41HQOWcEwUakThSA8U7"}
+{"result":"030JX48HPZI2VQREGFN4"}
 
 # get an alphanumeric code with the default length with all chars lowerCASED
 curl -X GET 'https://api.onetimecode.net/alphanumeric?case=lower'
