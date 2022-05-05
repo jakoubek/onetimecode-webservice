@@ -95,7 +95,7 @@ func (app *application) logRequests(next http.Handler) http.Handler {
 			log.Println("Log request for route:", r.RequestURI)
 		} else {
 			if r.RequestURI != "/" && r.RequestURI != "/healthz" {
-				go internal.LogRequestToPlausible(internal.NewLogRequestBody(r.RequestURI, r.Header.Get("X-Forwarded-For")))
+				go internal.LogRequestToPlausible(internal.NewLogRequestBody(r.RequestURI, r.Header.Get("X-Forwarded-For")), app.config.statsApiUrl)
 			}
 		}
 	})

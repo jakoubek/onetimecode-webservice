@@ -21,7 +21,8 @@ type config struct {
 		burst   int
 		enabled bool
 	}
-	securekey string
+	securekey   string
+	statsApiUrl string
 }
 
 type application struct {
@@ -43,6 +44,7 @@ func main() {
 	flag.IntVar(&cfg.limiter.burst, "limiter-burst", 3, "Rate limiter maximum burst")
 	flag.BoolVar(&cfg.limiter.enabled, "limiter-enabled", true, "Enable rate limiter")
 
+	flag.StringVar(&cfg.statsApiUrl, "statsapiurl", "", "Endpoint URL for the stats API")
 	flag.StringVar(&cfg.securekey, "securekey", "", "Securekey for accessing the metrics endpoint")
 
 	flag.Parse()

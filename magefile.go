@@ -27,6 +27,7 @@ var (
 	sshPort          string
 	sshUser          string
 	sshKeyfile       string
+	statsApiUrl      string
 	secureKey        string
 
 	buildVersion string
@@ -144,6 +145,7 @@ func LoadEnvironment() {
 	sshPort = os.Getenv("SSH_PORT")
 	sshUser = os.Getenv("SSH_USER")
 	sshKeyfile = os.Getenv("SSH_KEYFILE")
+	statsApiUrl = os.Getenv("STATS_API_URL")
 	secureKey = os.Getenv("SECUREKEY")
 }
 
