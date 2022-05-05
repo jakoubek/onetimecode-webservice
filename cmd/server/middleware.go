@@ -42,8 +42,6 @@ func (app *application) checkSecureKey(next http.Handler) http.Handler {
 
 		if r.URL.Query().Has("key") {
 			key := r.URL.Query().Get("key")
-			app.logger.Println("Key:", key)
-			app.logger.Println("Config-Key:", app.config.securekey)
 			if key == app.config.securekey {
 				next.ServeHTTP(w, r)
 			} else {
