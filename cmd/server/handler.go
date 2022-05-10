@@ -1,8 +1,12 @@
 package main
 
 import (
+	"expvar"
+	"fmt"
 	"github.com/jakoubek/onetimecode-webservice/internal"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 func (app *application) indexHandler() http.HandlerFunc {
@@ -12,11 +16,15 @@ func (app *application) indexHandler() http.HandlerFunc {
 }
 
 func (app *application) statusHandler(w http.ResponseWriter, r *http.Request) {
+	requests, _ := strconv.Atoi(expvar.Get("total_requests_received").String())
 	data := envelope{
-		"server_started": app.startupTime.UTC(),
-		"requests":       0,
-		"lastrequest":    0,
+		"version":        version,
+		"build_time":     buildTime,
+		"server_started": app.startupTime.UTC().String(),
+		"requests":       requests,
+		"timestamp":      time.Now().Unix(),
 	}
+	fmt.Printf("%#v", data)
 
 	err := app.writeJSON(w, http.StatusOK, data, nil)
 	if err != nil {

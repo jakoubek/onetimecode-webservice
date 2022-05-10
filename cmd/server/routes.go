@@ -19,6 +19,7 @@ func (app *application) routes() http.Handler {
 	router.MethodNotAllowed(http.HandlerFunc(app.methodNotAllowedResponse))
 
 	router.Get("/", app.indexHandler())
+	router.Get("/status", app.statusHandler)
 	router.Get("/healthz", app.healthcheckHandler)
 
 	router.Group(func(router chi.Router) {
