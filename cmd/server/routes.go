@@ -22,6 +22,7 @@ func (app *application) routes() http.Handler {
 	router.Get("/healthz", app.healthcheckHandler)
 
 	router.Group(func(router chi.Router) {
+		router.Use(app.checkNoLogging)
 		router.Use(app.logRequests)
 
 		router.Get("/number", app.numberHandler)

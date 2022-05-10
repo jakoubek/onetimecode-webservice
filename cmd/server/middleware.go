@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"expvar"
 	"fmt"
@@ -110,14 +111,29 @@ func (app *application) rateLimit(next http.Handler) http.Handler {
 	})
 }
 
+func (app *application) checkNoLogging(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Has("nologging") {
+			var ctx context.Context
+			if r.URL.Query().Get("nologging") == "1" {
+				ctx = context.WithValue(context.Background(), "nologging", true)
+			} else {
+				ctx = context.WithValue(context.Background(), "nologging", false)
+			}
+			r = r.WithContext(ctx)
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
 func (app *application) logRequests(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		next.ServeHTTP(w, r)
 		if strings.Contains(r.Host, "localhost") {
-			log.Println("Log request for route:", r.RequestURI)
+			log.Println("Log request for route:", r.URL.Path)
 		} else {
-			if r.RequestURI != "/" && r.RequestURI != "/healthz" {
-				go internal.LogRequestToPlausible(internal.NewLogRequestBody(r.RequestURI, r.Header.Get("X-Forwarded-For")), app.config.statsApiUrl)
+			if r.RequestURI != "/" && r.RequestURI != "/healthz" && r.Context().Value("nologging") == false {
+				go internal.LogRequestToPlausible(internal.NewLogRequestBody(r.URL.Path, r.Header.Get("X-Forwarded-For")), app.config.statsApiUrl)
 			}
 		}
 	})
