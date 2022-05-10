@@ -2,7 +2,6 @@ package main
 
 import (
 	"expvar"
-	"fmt"
 	"github.com/jakoubek/onetimecode-webservice/internal"
 	"net/http"
 	"strconv"
@@ -24,7 +23,6 @@ func (app *application) statusHandler(w http.ResponseWriter, r *http.Request) {
 		"requests":       requests,
 		"timestamp":      time.Now().Unix(),
 	}
-	fmt.Printf("%#v", data)
 
 	err := app.writeJSON(w, http.StatusOK, data, nil)
 	if err != nil {
