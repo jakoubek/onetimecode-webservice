@@ -113,15 +113,15 @@ func (app *application) rateLimit(next http.Handler) http.Handler {
 
 func (app *application) checkNoLogging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Query().Has("nologging") {
-			var ctx context.Context
-			if r.URL.Query().Get("nologging") == "1" {
-				ctx = context.WithValue(context.Background(), "nologging", true)
-			} else {
-				ctx = context.WithValue(context.Background(), "nologging", false)
-			}
-			r = r.WithContext(ctx)
+		isNoLoggingSet := false
+		if r.URL.Query().Has("nologging") && r.URL.Query().Get("nologging") == "1" {
+			isNoLoggingSet = true
 		}
+		if r.Header.Get("NoLogging") == "1" {
+			isNoLoggingSet = true
+		}
+		ctx := context.WithValue(context.Background(), "nologging", isNoLoggingSet)
+		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)
 	})
 }
