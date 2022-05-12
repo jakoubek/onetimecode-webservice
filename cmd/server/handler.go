@@ -129,6 +129,25 @@ func (app *application) uuidHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (app *application) ulidHandler(w http.ResponseWriter, r *http.Request) {
+
+	//rp, err := app.readRequestParameters(r)
+	//if err != nil {
+	//	app.logError(r, err)
+	//}
+
+	otc := internal.NewUlidCode()
+
+	data := envelope{
+		"result": otc.ResultAsString(),
+	}
+
+	err := app.writeJSON(w, http.StatusOK, data, nil)
+	if err != nil {
+		app.serverErrorResponse(w, r, err)
+	}
+}
+
 func (app *application) diceHandler(w http.ResponseWriter, r *http.Request) {
 
 	//rp, err := app.readRequestParameters(r)

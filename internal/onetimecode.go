@@ -3,6 +3,7 @@ package internal
 import (
 	"bytes"
 	"github.com/google/uuid"
+	"github.com/oklog/ulid/v2"
 	"github.com/segmentio/ksuid"
 	"math"
 	"math/rand"
@@ -188,6 +189,18 @@ func NewUuidCode(opts ...OnetimecodeConfig) *Onetimecode {
 	return otc
 }
 
+func NewUlidCode(opts ...OnetimecodeConfig) *Onetimecode {
+	otc := &Onetimecode{}
+	for _, opt := range opts {
+		opt(otc)
+	}
+	otc.stringCode = Ulid()
+	//if otc.withoutDashes == true {
+	//	otc.stringCode = strings.Replace(otc.stringCode, "-", "", -1)
+	//}
+	return otc
+}
+
 func (otc *Onetimecode) ResultAsString() string {
 	//if otc.stringCode == "" {
 	//	otc.stringCode = string(otc.code)
@@ -255,4 +268,11 @@ func Ksuid() string {
 // Uuid returns an UUID code.
 func Uuid() string {
 	return uuid.New().String()
+}
+
+// Ulid returns an ULID code.
+func Ulid() string {
+	t := time.Now()
+	entropy := ulid.Monotonic(rand.New(rand.NewSource(t.UnixNano())), 0)
+	return ulid.MustNew(ulid.Timestamp(t), entropy).String()
 }

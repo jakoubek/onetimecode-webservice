@@ -21,6 +21,7 @@ require (
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
+	github.com/oklog/ulid/v2 v2.0.2 // indirect
 	github.com/segmentio/ksuid v1.0.4
 	github.com/zhiminwen/magetool v0.0.0-20210602123633-3cec835c8da0 // indirect
 	github.com/zhiminwen/quote v0.0.0-20210113173315-5a6f3293124e // indirect

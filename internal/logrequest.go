@@ -16,11 +16,11 @@ type logRequestBody struct {
 	path          string `json:"-"`
 }
 
-func NewLogRequestBody(path string, address string) *logRequestBody {
+func NewLogRequestBody(path string, address string, domain string) *logRequestBody {
 	return &logRequestBody{
 		Name:          "pageview",
-		Url:           fmt.Sprintf("https://api.onetimecode.net%s", path),
-		Domain:        "api.onetimecode.net",
+		Url:           fmt.Sprintf("https://%s%s", domain, path),
+		Domain:        domain,
 		RemoteAddress: address,
 		path:          path,
 	}

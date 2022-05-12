@@ -30,6 +30,7 @@ func (app *application) routes() http.Handler {
 		router.Get("/alphanumeric", app.alphanumericHandler)
 		router.Get("/ksuid", app.ksuidHandler)
 		router.Get("/uuid", app.uuidHandler)
+		router.Get("/ulid", app.ulidHandler)
 		router.Get("/dice", app.diceHandler)
 		router.Get("/coin", app.coinHandler)
 	})

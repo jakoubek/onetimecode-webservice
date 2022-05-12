@@ -133,7 +133,7 @@ func (app *application) logRequests(next http.Handler) http.Handler {
 			log.Println("Log request for route:", r.URL.Path)
 		} else {
 			if r.RequestURI != "/" && r.RequestURI != "/healthz" && r.Context().Value("nologging") == false {
-				go internal.LogRequestToPlausible(internal.NewLogRequestBody(r.URL.Path, r.Header.Get("X-Forwarded-For")), app.config.statsApiUrl)
+				go internal.LogRequestToPlausible(internal.NewLogRequestBody(r.URL.Path, r.Header.Get("X-Forwarded-For"), app.config.statsApiDomain), app.config.statsApiUrl)
 			}
 		}
 	})
