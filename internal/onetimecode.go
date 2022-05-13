@@ -220,6 +220,9 @@ func (otc *Onetimecode) defineValueNumeric() {
 	rndNr := rand.Intn(otc.max-otc.min+1) + otc.min
 	otc.code = int64(rndNr)
 	otc.stringCode = strconv.FormatInt(otc.code, 10)
+	if len(otc.stringCode) < otc.length {
+		otc.stringCode = strings.Repeat("0", (otc.length-len(otc.stringCode))) + otc.stringCode
+	}
 }
 
 func (otc *Onetimecode) defineValueAlphanumeric() {
