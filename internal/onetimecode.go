@@ -41,6 +41,9 @@ type Onetimecode struct {
 func WithLength(length int) OnetimecodeConfig {
 	return func(code *Onetimecode) {
 		if length > -1 {
+			if code.codeType == ANumberedCode && length > 19 {
+				length = 19
+			}
 			code.length = length
 			code.min = int(math.Pow(10, float64(length-1)))
 			code.max = int(math.Pow(10, float64(length))) - 1
