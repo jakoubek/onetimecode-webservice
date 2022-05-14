@@ -57,6 +57,13 @@ curl -X GET 'https://api.onetimecode.net/ksuid'
 {"result":"28iEBXva5OhYVzvDK4iMmBZrP74"}
 ```
 
+### Universally Unique Lexicographically Sortable Identifier (ulid)
+
+```shell
+curl -X GET 'https://api.onetimecode.net/ulid'
+{"result":"01G31A604VZHPBCVVS5D4QEVK1"}
+```
+
 ### UUIDs
 
 ```shell
@@ -113,6 +120,7 @@ For the `/coin` endpoint:
 - `/number` returns a numerical code
 - `/alphanumeric` returns an alphanumerical code
 - `/uuid` returns an UUID
+- `/ulid` returns an ULID (see [ulid/spec](https://github.com/ulid/spec))
 - `/ksuid` returns a KSUID (see [segmentio/ksuid](https://github.com/segmentio/ksuid))
 - `/dice` is a shortcut for `/number?min=1&max=6`
 - `/coin` is a shortcut for `/number?min=0&max=1` and returns `heads` or `tails`  
@@ -135,8 +143,3 @@ Works with both or one of the params. `group_every` has a default of `4`, `group
 
 Applies only to `/number` and `/alphanumeric`.
 
-## Installation
-
-```
-go get -u github.com/jakoubek/onetimecode-webservice
-```
